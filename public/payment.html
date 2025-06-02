@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ödeme Sayfası</title>
+  <script src="https://js.stripe.com/v3/"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 40px 20px;
+    }
+    #payment-form {
+      max-width: 400px;
+      margin: 0 auto;
+      background-color: #f9f9f9;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    #card-element {
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+    }
+    #submit {
+      padding: 10px 20px;
+      background-color: #0077b6;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    #submit:hover {
+      background-color: #005f8a;
+    }
+    #payment-message {
+      color: green;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    #payment-error {
+      color: red;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Ödeme Yap</h2>
+  <p>Ödenecek Tutar: <span id="amount"></span> TL</p>
+  <form id="payment-form">
+    <div id="card-element"></div>
+    <button id="submit">Ödemeyi Tamamla</button>
+    <p id="payment-message"></p>
+    <p id="payment-error"></p>
+  </form>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const clientSecret = urlParams.get('clientSecret');
+    const reservationId = urlParams.get('reservationId');
+    const amount = urlParams.get('amount');
+    const email = urlParams.get('email');
+    const name = urlParams.get('name');
+
+    if(amount) {
+      const amountTL = (parseInt(amount) / 100).toFixed(2);
+      document.getElementById('amount').textContent = amountTL;
+    }
+
+    if (!clientSecret) {
+      document.getElementById('payment-message').textContent = "Geçersiz ödeme isteği.";
+    }
+
+    const stripe = Stripe('pk_test_51RSLtII5gl6SxDrToBjJDLhvZRX1NyeQyLXwfKQYpldQNeZlWYpb8jlHdHwkE21ijPwSDwNoGv3vncigaNQ1vT3K00wncwCRN2');
+    const elements = stripe.elements();
+    const card = elements.create('card');
+    card.mount('#card-element');
+
+    const form = document.getElementById('payment-form');
+    const paymentMessage = document.getElementById('payment-message');
+    const paymentError = document.getElementById('payment-error');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      paymentMessage.textContent = "";
+      paymentError.textContent = "";
+
+      try {
+        const {error, paymentIntent} = await stripe.confirmCardPayment(clientSecret, {
+          payment_method: {
+            card: card
+          }
+        });
+
+        if (error) {
+          paymentError.textContent = error.message;
+          return;
+        }
+
+        if (paymentIntent.status === 'succeeded') {
+          paymentMessage.textContent = "Ödeme başarılı! Rezervasyonunuz onaylandı.";
+
+          try {
+            const response = await fetch('/payment-success', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                reservationId: reservationId,
+                email: paymentIntent?.metadata?.email || email,
+                name: paymentIntent?.metadata?.name || name,
+                amount: paymentIntent.amount
+              })
+            });
+
+            const result = await response.json();
+            console.log('Sunucu yanıtı:', result);
+          } catch (fetchErr) {
+            console.error('Mail gönderimi hatası:', fetchErr);
+          }
+        }
+      } catch (err) {
+        console.error('Ödeme sırasında hata:', err);
+        paymentError.textContent = 'Ödeme sırasında hata oluştu.';
+      } finally {
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 4000);
+      }
+    });
+  </script>
+</body>
+</html>

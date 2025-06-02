@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Paneli - Vera Otel</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    main {
+      padding: 20px;
+      max-width: 800px;
+      margin: auto;
+      text-align: center;
+    }
+    nav a {
+      margin-right: 10px;
+    }
+    .panel-box {
+      background-color: #f8f8f8;
+      padding: 20px;
+      border-radius: 10px;
+      margin-top: 30px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    h2 {
+      color: #0077b6;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Admin Paneli</h1>
+    <nav>
+      <a href="dashboard-admin.html">Genel</a>
+      <a href="manage-rooms.html">Odalar</a>
+      <a href="manage-users.html">Kullanıcılar</a>
+      <a href="manage-reservations.html">Rezervasyonlar</a>
+      <a href="admin-settings.html">Ayarlar</a>
+      <a href="#" onclick="logout()">Çıkış Yap</a>
+    </nav>
+  </header>
+
+  <main>
+    <h2>Hoşgeldiniz, Admin!</h2>
+    <div class="panel-box">
+      <p>Vera Otel Yönetim Paneline hoş geldiniz.</p>
+      <p>Yukarıdaki menüleri kullanarak aşağıdaki işlemleri gerçekleştirebilirsiniz:</p>
+      <ul style="text-align: left; display: inline-block;">
+        <li>🧑 Kullanıcı hesaplarını görüntüleyebilir, düzenleyebilir veya silebilirsiniz.</li>
+        <li>🏨 Odaları ekleyebilir, güncelleyebilir veya silebilirsiniz.</li>
+        <li>📅 Tüm rezervasyonları yönetebilir ve kontrol edebilirsiniz.</li>
+        <li>⚙️ Site ayarlarını düzenleyebilirsiniz.</li>
+      </ul>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Vera Otel</p>
+  </footer>
+
+  <script>
+    function logout() {
+      fetch('/logout')
+        .then(() => {
+          window.location.href = '/index.html';
+        })
+        .catch(err => {
+          console.error("Çıkış yapılamadı:", err);
+          alert("Çıkış sırasında bir hata oluştu.");
+        });
+    }
+  </script>
+</body>
+</html>

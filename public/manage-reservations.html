@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Rezervasyon Yönetimi - Admin Paneli</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    h2 {
+      color: #0077b6;
+    }
+    nav a {
+      margin-right: 10px;
+    }
+    .paid {
+      background-color: #d4edda;
+    }
+    .unpaid {
+      background-color: #f8d7da;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: left;
+    }
+    th {
+      background-color: #f0f0f0;
+    }
+    button {
+      padding: 5px 10px;
+    }
+    select {
+      margin-top: 10px;
+      padding: 5px;
+    }
+    .panel-box {
+      background-color: #f8f8f8;
+      padding: 20px;
+      border-radius: 10px;
+      margin-top: 30px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    input, select {
+      padding: 5px;
+      margin: 5px 0;
+      width: 100%;
+      max-width: 300px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Admin Paneli</h1>
+    <nav>
+      <a href="dashboard-admin.html">Dashboard</a>
+      <a href="manage-rooms.html">Odalar</a>
+      <a href="manage-users.html">Kullanıcılar</a>
+      <a href="manage-reservations.html">Rezervasyonlar</a>
+      <a href="admin-settings.html">Ayarlar</a>
+      <a href="#" onclick="logout()">Çıkış Yap</a>
+    </nav>
+  </header>
+
+  <h2>Rezervasyon Yönetimi</h2>
+
+  <div class="panel-box">
+    <h3>Manuel Rezervasyon Ekle</h3>
+    <form id="reservation-form">
+      <label>İsim:</label>
+      <input type="text" id="name" required><br>
+
+      <label>Email:</label>
+      <input type="email" id="email" required><br>
+
+      <label>Oda Türü:</label>
+      <select id="room" required>
+        <option value="">Seçiniz</option>
+        <option value="standart">Standart</option>
+        <option value="deluxe">Deluxe</option>
+        <option value="suit">Suit</option>
+      </select><br>
+
+      <label>Giriş Tarihi:</label>
+      <input type="date" id="checkin" required><br>
+
+      <label>Çıkış Tarihi:</label>
+      <input type="date" id="checkout" required><br>
+
+      <p>Toplam Tutar: <strong id="calculatedAmount">-</strong> TL</p>
+
+      <button type="submit">Rezervasyonu Kaydet</button>
+    </form>
+  </div>
+
+  <label for="filter">Filtrele:</label>
+  <select id="filter" onchange="fetchReservations()">
+    <option value="all">Hepsi</option>
+    <option value="paid">Sadece Ödenmiş</option>
+    <option value="unpaid">Sadece Ödenmemiş</option>
+  </select>
+
+  <table id="reservationTable">
+    <thead>
+      <tr>
+        <th>İsim</th>
+        <th>E-posta</th>
+        <th>Oda</th>
+        <th>Giriş</th>
+        <th>Çıkış</th>
+        <th>Tutar</th>
+        <th>Durum</th>
+        <th>İşlem</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const roomPrices = {
+      standart: 800,
+      deluxe: 1200,
+      suit: 1500
+    };
+
+    document.getElementById("room").addEventListener("change", calculateAmount);
+    document.getElementById("checkin").addEventListener("change", calculateAmount);
+    document.getElementById("checkout").addEventListener("change", calculateAmount);
+
+    function calculateAmount() {
+      const room = document.getElementById("room").value;
+      const checkin = new Date(document.getElementById("checkin").value);
+      const checkout = new Date(document.getElementById("checkout").value);
+
+      if (!room || isNaN(checkin.getTime()) || isNaN(checkout.getTime())) {
+        document.getElementById("calculatedAmount").textContent = "-";
+        return;
+      }
+
+      const nights = Math.ceil((checkout - checkin) / (1000 * 60 * 60 * 24));
+      if (nights <= 0) {
+        document.getElementById("calculatedAmount").textContent = "Hatalı tarih";
+        return;
+      }
+
+      const total = nights * roomPrices[room];
+      document.getElementById("calculatedAmount").textContent = total.toFixed(2);
+    }
+
+    document.getElementById("reservation-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+      const room = document.getElementById("room").value;
+      const checkin = document.getElementById("checkin").value;
+      const checkout = document.getElementById("checkout").value;
+
+      try {
+        const response = await fetch("/admin/manual-reservation", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, email, room, checkin, checkout })
+        });
+
+        if (response.ok) {
+          alert("Rezervasyon başarıyla kaydedildi.");
+          document.getElementById("reservation-form").reset();
+          document.getElementById("calculatedAmount").textContent = "-";
+          fetchReservations();
+        } else {
+          alert("Rezervasyon eklenemedi.");
+        }
+      } catch (err) {
+        console.error("Rezervasyon ekleme hatası:", err);
+      }
+    });
+
+    async function fetchReservations() {
+      try {
+        const res = await fetch('/admin/reservations');
+        const reservations = await res.json();
+        const filter = document.getElementById('filter').value;
+        const tbody = document.querySelector('#reservationTable tbody');
+        tbody.innerHTML = "";
+
+        reservations.forEach(r => {
+          if (filter === 'paid' && r.paymentStatus !== 'paid') return;
+          if (filter === 'unpaid' && r.paymentStatus === 'paid') return;
+
+          const tr = document.createElement('tr');
+          tr.className = r.paymentStatus === 'paid' ? 'paid' : 'unpaid';
+          tr.innerHTML = `
+            <td>${r.name}</td>
+            <td>${r.email}</td>
+            <td>${r.room}</td>
+            <td>${new Date(r.checkin).toLocaleDateString()}</td>
+            <td>${new Date(r.checkout).toLocaleDateString()}</td>
+            <td>₺${(r.amount / 100).toFixed(2)}</td>
+            <td>${r.paymentStatus === 'paid' ? 'Ödendi' : 'Bekliyor'}</td>
+            <td>${r.paymentStatus !== 'paid' ? `<button onclick="markAsPaid('${r._id}')">Ödendi Olarak İşaretle</button>` : ''}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (err) {
+        console.error("Rezervasyonlar alınamadı:", err);
+        alert("Rezervasyonları getirirken hata oluştu.");
+      }
+    }
+
+    async function markAsPaid(id) {
+      try {
+        const response = await fetch(`/admin/mark-paid/${id}`, {
+          method: 'POST'
+        });
+        if (response.ok) {
+          alert('Rezervasyon ödendi olarak işaretlendi.');
+          fetchReservations();
+        } else {
+          alert('İşlem başarısız oldu.');
+        }
+      } catch (error) {
+        console.error('Ödeme güncellenemedi:', error);
+      }
+    }
+
+    function logout() {
+      fetch('/logout')
+        .then(() => window.location.href = '/index.html')
+        .catch(err => alert("Çıkış sırasında bir hata oluştu."));
+    }
+
+    fetchReservations();
+  </script>
+</body>
+</html>

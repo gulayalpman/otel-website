@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Misafir Paneli</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header>
+    <h1>Misafir Paneli</h1>
+    <nav>
+      <a href="index.html">Anasayfa</a>
+      <a href="/logout">Çıkış Yap</a>
+    </nav>
+  </header>
+
+  <main>
+    <h2>Hoşgeldiniz, <span id="username">Misafir</span>!</h2>
+
+    <section>
+      <h3>Aktif Rezervasyonlarım</h3>
+      <ul id="active-reservation-list">
+      </ul>
+    </section>
+
+    <section>
+      <h3>Geçmiş Rezervasyonlarım</h3>
+      <ul id="past-reservation-list">
+      </ul>
+    </section>
+
+    <section style="text-align: center; margin-top: 40px;">
+      <button id="logoutBtn" class="logout-button">Oturumu Kapat</button>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Vera Otel</p>
+  </footer>
+
+  <script>
+    function formatDate(dateString) {
+      const d = new Date(dateString);
+      return d.toLocaleDateString('tr-TR');
+    }
+
+    async function loadUserInfo() {
+      try {
+        const res = await fetch('/api/user-info');
+        if (!res.ok) throw new Error('Kullanıcı bilgisi alınamadı');
+        const user = await res.json();
+        document.getElementById('username').textContent = user.username;
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    async function loadReservations() {
+      try {
+        const response = await fetch('/reservations'); 
+        if (!response.ok) throw new Error('Rezervasyonlar alınamadı.');
+
+        const data = await response.json();
+
+        const activeList = document.getElementById('active-reservation-list');
+        const pastList = document.getElementById('past-reservation-list');
+
+        activeList.innerHTML = '';
+        pastList.innerHTML = '';
+
+        if (data.active.length === 0) {
+          activeList.innerHTML = '<li>Aktif rezervasyon bulunmamaktadır.</li>';
+        } else {
+          data.active.forEach(res => {
+            const li = document.createElement('li');
+            li.textContent = `Oda: ${res.room} - Giriş: ${formatDate(res.checkin)} - Çıkış: ${formatDate(res.checkout)}`;
+            activeList.appendChild(li);
+          });
+        }
+
+        if (data.past.length === 0) {
+          pastList.innerHTML = '<li>Geçmiş rezervasyon bulunmamaktadır.</li>';
+        } else {
+          data.past.forEach(res => {
+            const li = document.createElement('li');
+            li.textContent = `Oda: ${res.room} - Giriş: ${formatDate(res.checkin)} - Çıkış: ${formatDate(res.checkout)}`;
+            pastList.appendChild(li);
+          });
+        }
+      } catch (error) {
+        console.error(error);
+        alert('Rezervasyonlar yüklenirken hata oluştu.');
+      }
+    }
+
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      try {
+        const response = await fetch('/logout');
+        if (response.redirected) {
+          window.location.href = response.url;
+        } else {
+          window.location.href = '/';
+        }
+      } catch (error) {
+        alert("Çıkış işlemi başarısız oldu.");
+        console.error(error);
+      }
+    });
+
+    loadUserInfo();
+    loadReservations();
+  </script>
+</body>
+</html>

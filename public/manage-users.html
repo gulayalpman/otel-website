@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Kullanıcı Yönetimi - Admin Paneli</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    h2 {
+      color: #0077b6;
+    }
+    nav a {
+      margin-right: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: left;
+    }
+    th {
+      background-color: #f0f0f0;
+    }
+    button {
+      padding: 6px 10px;
+      margin-right: 5px;
+      cursor: pointer;
+    }
+    .admin {
+      color: green;
+    }
+    .misafir {
+      color: blue;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Admin Paneli</h1>
+    <nav>
+      <a href="dashboard-admin.html">Dashboard</a>
+      <a href="manage-rooms.html">Odalar</a>
+      <a href="manage-users.html">Kullanıcılar</a>
+      <a href="manage-reservations.html">Rezervasyonlar</a>
+      <a href="admin-settings.html">Ayarlar</a>
+      <a href="#" onclick="logout()">Çıkış Yap</a>
+    </nav>
+  </header>
+
+  <h2>Kullanıcı Yönetimi</h2>
+  <p>Kayıtlı tüm kullanıcıları buradan yönetebilirsiniz.</p>
+
+  <table id="userTable">
+    <thead>
+      <tr>
+        <th>İsim</th>
+        <th>E-posta</th>
+        <th>Rol</th>
+        <th>İşlemler</th>
+      </tr>
+    </thead>
+    <tbody>
+    
+    </tbody>
+  </table>
+
+  <script>
+    async function fetchUsers() {
+      try {
+        const res = await fetch('/admin/users');
+        const users = await res.json();
+        const tbody = document.querySelector('#userTable tbody');
+        tbody.innerHTML = "";
+
+        users.forEach(user => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${user.username || '-'}</td>
+            <td>${user.email}</td>
+            <td class="${user.role}">${user.role}</td>
+            <td>
+              <button onclick="changeRole('${user._id}', '${user.role}')">Rol Değiştir</button>
+              <button onclick="deleteUser('${user._id}')">Sil</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (err) {
+        console.error("Kullanıcılar alınamadı:", err);
+      }
+    }
+
+    async function changeRole(userId, currentRole) {
+      const newRole = currentRole === 'admin' ? 'misafir' : 'admin';
+      const confirmed = confirm(`Kullanıcının rolü "${newRole}" olarak değiştirilsin mi?`);
+      if (!confirmed) return;
+
+      const res = await fetch('/admin/update-role', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, newRole })
+      });
+
+      const data = await res.json();
+      alert(data.message);
+      fetchUsers();
+    }
+
+    async function deleteUser(userId) {
+      const confirmed = confirm("Bu kullanıcıyı silmek istediğinize emin misiniz?");
+      if (!confirmed) return;
+
+      const res = await fetch(`/admin/users/${userId}`, {
+        method: 'DELETE'
+      });
+
+      const data = await res.json();
+      alert(data.message);
+      fetchUsers();
+    }
+
+    function logout() {
+      fetch('/logout')
+        .then(() => {
+          window.location.href = '/index.html';
+        })
+        .catch(err => {
+          console.error("Çıkış yapılamadı:", err);
+          alert("Çıkış sırasında bir hata oluştu.");
+        });
+    }
+
+    fetchUsers();
+  </script>
+</body>
+</html>

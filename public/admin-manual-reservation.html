@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Manuel Rezervasyon Ekle</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 30px auto;
+      padding: 20px;
+      background-color: #f7f7f7;
+    }
+    h2 {
+      color: #0077b6;
+      text-align: center;
+    }
+    form {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      box-sizing: border-box;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    button {
+      margin-top: 20px;
+      background-color: #0077b6;
+      color: white;
+      border: none;
+      padding: 12px;
+      width: 100%;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #005f8a;
+    }
+    .message {
+      margin-top: 15px;
+      text-align: center;
+      font-weight: bold;
+    }
+    #priceDisplay {
+      margin-top: 10px;
+      font-weight: bold;
+      color: #0077b6;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Manuel Rezervasyon Ekle</h2>
+
+  <form id="manualReservationForm">
+    <label for="name">Misafir Adı</label>
+    <input type="text" id="name" name="name" required />
+
+    <label for="email">Misafir E-posta</label>
+    <input type="email" id="email" name="email" required />
+
+    <label for="room">Oda Tipi</label>
+    <select id="room" name="room" required>
+      <option value="">Seçiniz</option>
+      <option value="standart">Standart</option>
+      <option value="deluxe">Deluxe</option>
+      <option value="suit">Suit</option>
+    </select>
+
+    <label for="checkin">Giriş Tarihi</label>
+    <input type="date" id="checkin" name="checkin" required />
+
+    <label for="checkout">Çıkış Tarihi</label>
+    <input type="date" id="checkout" name="checkout" required />
+
+    <div id="priceDisplay"></div>
+
+    <button type="submit">Rezervasyonu Kaydet</button>
+
+    <div class="message" id="message"></div>
+  </form>
+
+  <script>
+    const roomPrices = {
+      standart: 800,
+      deluxe: 1200,
+      suit: 1800
+    };
+
+    const form = document.getElementById('manualReservationForm');
+    const roomSelect = document.getElementById('room');
+    const checkinInput = document.getElementById('checkin');
+    const checkoutInput = document.getElementById('checkout');
+    const priceDisplay = document.getElementById('priceDisplay');
+    const messageDiv = document.getElementById('message');
+
+    function calculatePrice() {
+      const room = roomSelect.value;
+      const checkin = new Date(checkinInput.value);
+      const checkout = new Date(checkoutInput.value);
+
+      if (!room || !checkinInput.value || !checkoutInput.value) {
+        priceDisplay.textContent = '';
+        return;
+      }
+
+      if (checkout <= checkin) {
+        priceDisplay.textContent = 'Çıkış tarihi, giriş tarihinden sonra olmalıdır.';
+        priceDisplay.style.color = 'red';
+        return;
+      }
+
+      const msPerDay = 1000 * 60 * 60 * 24;
+      const nights = Math.round((checkout - checkin) / msPerDay);
+
+      if (nights <= 0) {
+        priceDisplay.textContent = 'Geçerli bir gece sayısı giriniz.';
+        priceDisplay.style.color = 'red';
+        return;
+      }
+
+      const price = roomPrices[room] * nights;
+      priceDisplay.textContent = `Toplam fiyat: ${price} TL (${nights} gece)`;
+      priceDisplay.style.color = '#0077b6';
+    }
+
+    roomSelect.addEventListener('change', calculatePrice);
+    checkinInput.addEventListener('change', calculatePrice);
+    checkoutInput.addEventListener('change', calculatePrice);
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      messageDiv.textContent = '';
+      messageDiv.style.color = 'black';
+
+      const name = form.name.value.trim();
+      const email = form.email.value.trim();
+      const room = form.room.value;
+      const checkin = form.checkin.value;
+      const checkout = form.checkout.value;
+
+      if (new Date(checkin) >= new Date(checkout)) {
+        messageDiv.textContent = 'Çıkış tarihi, giriş tarihinden sonra olmalıdır.';
+        messageDiv.style.color = 'red';
+        return;
+      }
+
+      try {
+        const response = await fetch('/admin/manual-reservation', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, room, checkin, checkout })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          messageDiv.textContent = 'Rezervasyon başarıyla oluşturuldu!';
+          messageDiv.style.color = 'green';
+          form.reset();
+          priceDisplay.textContent = '';
+        } else {
+          messageDiv.textContent = 'Hata: ' + (data.message || 'Bilinmeyen hata');
+          messageDiv.style.color = 'red';
+        }
+      } catch (error) {
+        messageDiv.textContent = 'Sunucu hatası, lütfen tekrar deneyin.';
+        messageDiv.style.color = 'red';
+      }
+    });
+  </script>
+
+</body>
+</html>

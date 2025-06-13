@@ -1,0 +1,319 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+header {
+  background-color: #0077b6;
+  color: white;
+  padding: 20px;
+  text-align: center;
+  position: relative; 
+}
+
+nav a {
+  color: white;
+  margin: 0 10px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+  padding: 8px 12px;
+  border-radius: 4px;
+}
+
+nav a:hover {
+  background-color: #005f8a;
+}
+
+main {
+  padding: 20px;
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+footer {
+  background-color: #f1f1f1;
+  text-align: center;
+  padding: 10px;
+}
+
+form {
+  background-color: #fff;
+  padding: 30px 20px;
+  margin: 40px auto;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  width: 350px;
+  max-width: 90%;
+  box-sizing: border-box;
+}
+
+form label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #333;
+}
+
+form input,
+form select,
+form button {
+  width: 100%;
+  padding: 12px 15px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease;
+}
+
+form input:focus,
+form select:focus {
+  outline: none;
+  border-color: #0077b6;
+}
+
+form button {
+  background-color: #0077b6;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+form button:hover {
+  background-color: #005f8a;
+}
+
+#success-message {
+  margin-top: 20px;
+  font-weight: 700;
+  color: green;
+  text-align: center;
+}
+
+.room-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 20px auto;
+  max-width: 600px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  text-align: center;
+}
+
+.room-card img {
+  max-width: 400px;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  display: block;
+  margin: 0 auto;
+}
+
+.room-card h2 {
+  margin-top: 0;
+  color: #333;
+  font-weight: 700;
+}
+
+.room-card p {
+  color: #555;
+}
+
+.room-card .price {
+  font-weight: 700;
+  margin-top: 10px;
+}
+
+.reserve-button {
+  display: block;
+  margin: 10px auto 0 auto;
+  padding: 8px 16px;
+  background-color: #0077b6;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  text-align: center;
+  cursor: pointer;
+  width: fit-content;
+  font-weight: 700;
+  transition: background-color 0.3s ease;
+}
+
+.reserve-button:hover {
+  background-color: #005f8a;
+}
+
+nav ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+nav li {
+  display: inline;
+}
+
+nav a {
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 8px 12px;
+  transition: background-color 0.3s ease;
+  border-radius: 4px;
+}
+
+nav a:hover {
+  background-color: #005f8a;
+}
+
+.auth-buttons {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.auth-buttons .btn {
+  background-color: #0077b6;
+  color: white;
+  padding: 8px 14px;
+  margin-left: 10px;
+  text-decoration: none;
+  border-radius: 4px;
+  font-weight: 700;
+  transition: background-color 0.3s ease;
+}
+
+.auth-buttons .btn:hover {
+  background-color: #005f8a;
+}
+
+.banner {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 900px; 
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  border-radius: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding: 0;
+}
+
+header nav {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.events-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
+
+.events-container h1 {
+  color: #0077b6;
+  margin-bottom: 30px;
+}
+
+.carousel-item img {
+  max-height: 500px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.logout-button {
+  margin-top: 30px;
+  padding: 10px 20px;
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.logout-button:hover {
+  background-color: #cc0000;
+}
+
+ul#active-reservation-list li,
+ul#past-reservation-list li {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  padding: 10px 16px;
+  margin: 10px auto;
+  border-radius: 6px;
+  max-width: 600px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  font-weight: 600;
+  text-align: left;
+  color: #333;
+  list-style: none;
+}
+
+.form-title {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.form-footer {
+  text-align: center;
+  margin-top: -10px;
+  font-size: 14px;
+}
+
+#payment-form {
+  background-color: #fff;
+  padding: 30px 20px;
+  margin: 40px auto;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  width: 350px;
+  max-width: 90%;
+  box-sizing: border-box;
+}
+
+#card-element {
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+  max-width: 400px;
+  width: 100%;
+  margin: 0 auto 20px auto;
+  box-sizing: border-box;
+}
+
+#payment-message {
+  color: green;
+  font-weight: bold;
+  text-align: center;
+}
+
+#payment-error {
+  color: red;
+  font-weight: bold;
+  text-align: center;
+}
+
+

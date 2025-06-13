@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Hesap Doğrulama</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <h2>Hesap Doğrulama</h2>
+
+  <form id="verifyForm">
+    <input type="email" id="email" placeholder="E-posta" required />
+    <input type="text" id="code" placeholder="Doğrulama Kodu" required maxlength="6" />
+    <button type="submit">Doğrula</button>
+  </form>
+
+  <div class="link">
+    <p>Doğrulama kodu göndermek için <a href="register.html">kayıt olmalısınız</a>.</p>
+  </div>
+
+  <script>
+    const form = document.getElementById('verifyForm');
+
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const email = document.getElementById('email').value.trim();
+      const code = document.getElementById('code').value.trim();
+
+      try {
+        const response = await fetch('/verify-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email, verificationCode: code })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          alert('Doğrulama başarılı! Giriş yapabilirsiniz.');
+          window.location.href = 'login.html';
+        } else {
+          
+          if (data.message && data.message.includes("Kod süresi dolmuş")) {
+            alert("Kodun süresi dolmuş. Yeni bir kod e-posta adresinize gönderildi.");
+          } else {
+            alert('Hata: ' + data.message);
+          }
+        }
+      } catch (error) {
+        alert('Sunucuya bağlanırken hata oluştu.');
+        console.error(error);
+      }
+    });
+  </script>
+
+</body>
+</html>

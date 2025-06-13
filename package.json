@@ -1,0 +1,22 @@
+{
+  "name": "otel-website",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "connect-mongodb-session": "^5.0.0",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "express-session": "^1.18.1",
+    "mongodb": "^6.16.0",
+    "nodemailer": "^7.0.3",
+    "stripe": "^18.1.1",
+    "argon2": "^0.30.1"
+  },
+  "description": ""
+}

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vera | Odalar</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <header>
+    <h1>Vera Otel - Odalarımız</h1>
+    <nav>
+      <a href="index.html">Anasayfa</a>
+      <a href="rooms.html">Odalar</a>
+      <a href="reservation.html">Rezervasyon</a>
+      <a href="contact.html">İletişim</a>
+    </nav>
+    <div class="auth-buttons">
+    <a href="register.html" class="btn">Kaydol</a>
+    <a href="login.html" class="btn">Giriş Yap</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="room-card">
+      <h2>Standart Oda</h2>
+      <img src="images/standart.jpg" alt="Standart Oda" />
+      <a href="room-details.html#Standart" class="reserve-button">Detaylar</a>
+    </div>
+
+    <div class="room-card">
+      <h2>Deluxe Oda</h2>
+      <img src="images/deluxe.jpg" alt="Deluxe Oda" />
+      <a href="room-details.html#Deluxe" class="reserve-button">Detaylar</a>
+    </div>
+
+    <div class="room-card">
+      <h2>Suit Oda</h2>
+      <img src="images/suit.jpg" alt="Suit Oda" />
+      <a href="room-details.html#Suit" class="reserve-button">Detaylar</a>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Vera Otel. Tüm hakları saklıdır.</p>
+  </footer>
+
+  <script>
+    
+    window.onload = function() {
+      const hash = window.location.hash.substring(1);
+      if(hash) {
+        const tabButton = document.querySelector(`.tab button[onclick*="${hash}"]`);
+        if(tabButton) {
+          tabButton.click();
+        }
+      }
+    };
+  </script>
+
+</body>
+</html>
+

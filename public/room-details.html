@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vera | Konaklama Hizmetleri</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    
+    .tab {
+      overflow: hidden;
+      border-bottom: 2px solid #0077b6;
+      margin-bottom: 20px;
+    }
+
+    .tab button {
+      background-color: inherit;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      padding: 14px 20px;
+      transition: background-color 0.3s;
+      font-size: 17px;
+      color: #0077b6;
+      font-weight: bold;
+    }
+
+    .tab button:hover {
+      background-color: #ddd;
+    }
+
+    .tab button.active {
+      border-bottom: 3px solid #005f8a;
+      color: #005f8a;
+    }
+
+    
+    .tabcontent {
+      display: none;
+      animation: fadeEffect 0.5s;
+    }
+
+    @keyframes fadeEffect {
+      from {opacity: 0;}
+      to {opacity: 1;}
+    }
+
+    
+    .room-detail p {
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    
+    .room-images {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .room-images img {
+      width: 45%;
+      border-radius: 8px;
+      height: auto;
+      object-fit: cover;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+
+    .room-images img:hover {
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Vera Otel - Konaklama Hizmetleri</h1>
+    <nav>
+      <a href="index.html">Anasayfa</a>
+      <a href="rooms.html">Odalar</a>
+      <a href="reservation.html">Rezervasyon</a>
+      <a href="contact.html">İletişim</a>
+    </nav>
+    <div class="auth-buttons">
+    <a href="register.html" class="btn">Kaydol</a>
+    <a href="login.html" class="btn">Giriş Yap</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="tab">
+      <button class="tablinks active" onclick="openRoom(event, 'Standart')">Standart Oda</button>
+      <button class="tablinks" onclick="openRoom(event, 'Deluxe')">Deluxe Oda</button>
+      <button class="tablinks" onclick="openRoom(event, 'Suit')">Suit Oda</button>
+    </div>
+
+    <div id="Standart" class="tabcontent" style="display:block;">
+      <div class="room-detail">
+        <h2>Standart Oda</h2>
+        <div class="room-images">
+          <img src="images/standart.jpg" alt="Standart Oda" />
+          <img src="images/standart_banyo1.jpg" alt="Standart Banyo" />
+        </div>
+        <p>Rahat ve ekonomik, çift kişilik yatak, klima ve TV bulunmaktadır.</p>
+        <p><strong>Fiyat:</strong> 800 TL / gece</p>
+      </div>
+    </div>
+
+    <div id="Deluxe" class="tabcontent">
+      <div class="room-detail">
+        <h2>Deluxe Oda</h2>
+        <div class="room-images">
+          <img src="images/deluxe.jpg" alt="Deluxe Oda" />
+          <img src="images/deluxe_banyo1.jpg" alt="Deluxe Banyo" />
+        </div>
+        <p>Manzaralı balkon, king size yatak, minibar ve şık banyo mevcuttur.</p>
+        <p><strong>Fiyat:</strong> 1200 TL / gece</p>
+      </div>
+    </div>
+
+    <div id="Suit" class="tabcontent">
+      <div class="room-detail">
+        <h2>Suit Oda</h2>
+        <div class="room-images">
+          <img src="images/suit.jpg" alt="Suit Oda" />
+          <img src="images/suit_banyo1.jpg" alt="Suit Banyo" />
+        </div>
+        <p>Lüks tasarım, geniş alan, jakuzi ve özel teras bulunmaktadır.</p>
+        <p><strong>Fiyat:</strong> 1800 TL / gece</p>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Vera Otel. Tüm hakları saklıdır.</p>
+  </footer>
+
+  <script>
+    function openRoom(evt, roomName) {
+      var i, tabcontent, tablinks;
+      tabcontent = document.getElementsByClassName("tabcontent");
+      for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+      }
+      tablinks = document.getElementsByClassName("tablinks");
+      for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+      }
+      document.getElementById(roomName).style.display = "block";
+      evt.currentTarget.className += " active";
+    }
+  </script>
+
+</body>
+</html>

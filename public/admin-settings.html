@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Site Ayarları - Admin Paneli</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    h2 {
+      color: #0077b6;
+    }
+    nav a {
+      margin-right: 10px;
+    }
+    form {
+      max-width: 500px;
+      background-color: #f9f9f9;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+    }
+    button {
+      margin-top: 15px;
+      padding: 10px 15px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Admin Paneli</h1>
+    <nav>
+      <a href="dashboard-admin.html">Dashboard</a>
+      <a href="manage-rooms.html">Odalar</a>
+      <a href="manage-users.html">Kullanıcılar</a>
+      <a href="manage-reservations.html">Rezervasyonlar</a>
+      <a href="admin-settings.html">Ayarlar</a>
+      <a href="#" onclick="logout()">Çıkış Yap</a>
+    </nav>
+  </header>
+
+  <h2>Site Ayarları</h2>
+
+  <form id="settingsForm">
+    <label for="contactEmail">İletişim E-Postası</label>
+    <input type="email" id="contactEmail" value="iletisim@veraotel.com" />
+
+    <label for="supportPhone">Destek Telefonu</label>
+    <input type="text" id="supportPhone" value="0555 123 45 67" />
+
+    <label for="mailSubject">Mail Başlığı (Doğrulama)</label>
+    <input type="text" id="mailSubject" value="Vera Otel Hesap Doğrulama" />
+
+    <button type="submit">Ayarları Kaydet</button>
+  </form>
+
+  <script>
+    // Ayarları kaydet
+    document.getElementById('settingsForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const contactEmail = document.getElementById('contactEmail').value;
+      const supportPhone = document.getElementById('supportPhone').value;
+      const mailSubject = document.getElementById('mailSubject').value;
+
+      try {
+        const response = await fetch('/admin/settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contactEmail, supportPhone, mailSubject })
+        });
+
+        const data = await response.json();
+        alert(data.message || "Ayarlar güncellendi.");
+      } catch (err) {
+        console.error("Ayarlar kaydedilirken hata:", err);
+        alert("Sunucu hatası oluştu.");
+      }
+    });
+
+    // Sayfa yüklendiğinde ayarı getir
+    window.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const res = await fetch('/admin/settings');
+        const data = await res.json();
+        if (data) {
+          document.getElementById('contactEmail').value = data.contactEmail || '';
+          document.getElementById('supportPhone').value = data.supportPhone || '';
+          document.getElementById('mailSubject').value = data.mailSubject || '';
+        }
+      } catch (err) {
+        console.error("Ayarlar getirilemedi:", err);
+      }
+    });
+
+    function logout() {
+      fetch('/logout')
+        .then(() => {
+          window.location.href = '/index.html';
+        })
+        .catch(err => {
+          console.error("Çıkış yapılamadı:", err);
+          alert("Çıkış sırasında bir hata oluştu.");
+        });
+    }
+  </script>
+
+</body>
+</html>

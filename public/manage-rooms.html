@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Oda Yönetimi - Admin Paneli</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    h2 {
+      color: #0077b6;
+    }
+    nav a {
+      margin-right: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: left;
+    }
+    th {
+      background-color: #f0f0f0;
+    }
+    button {
+      padding: 6px 10px;
+      margin-right: 5px;
+      cursor: pointer;
+    }
+    form {
+      margin-top: 30px;
+      background-color: #f9f9f9;
+      padding: 15px;
+      border-radius: 8px;
+    }
+    input, select {
+      margin: 5px 0;
+      padding: 8px;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Admin Paneli</h1>
+    <nav>
+      <a href="dashboard-admin.html">Dashboard</a>
+      <a href="manage-rooms.html">Odalar</a>
+      <a href="manage-users.html">Kullanıcılar</a>
+      <a href="manage-reservations.html">Rezervasyonlar</a>
+      <a href="admin-settings.html">Ayarlar</a>
+      <a href="#" onclick="logout()">Çıkış Yap</a>
+    </nav>
+  </header>
+
+  <h2>Oda Yönetimi</h2>
+  <p>Otel odalarını buradan ekleyebilir, düzenleyebilir veya silebilirsiniz.</p>
+
+  <table id="roomTable">
+    <thead>
+      <tr>
+        <th>Oda Adı</th>
+        <th>Tür</th>
+        <th>Fiyat (₺)</th>
+        <th>Durum</th>
+        <th>İşlemler</th>
+      </tr>
+    </thead>
+    <tbody>
+    
+    </tbody>
+  </table>
+
+  <h3>Yeni Oda Ekle</h3>
+  <form id="addRoomForm">
+    <input type="text" id="roomName" placeholder="Oda Adı" required />
+    <select id="roomType" required>
+      <option value="">Tür Seçin</option>
+      <option value="standart">Standart</option>
+      <option value="deluxe">Deluxe</option>
+      <option value="suit">Suit</option>
+    </select>
+    <input type="number" id="roomPrice" placeholder="Fiyat (₺)" required />
+    <select id="roomStatus" required>
+      <option value="">Durum Seçin</option>
+      <option value="dolu">Dolu</option>
+      <option value="boş">Boş</option>
+    </select>
+    <button type="submit">Odayı Ekle</button>
+  </form>
+
+  <script>
+    async function fetchRooms() {
+      const res = await fetch('/admin/rooms');
+      const rooms = await res.json();
+      const tbody = document.querySelector('#roomTable tbody');
+      tbody.innerHTML = "";
+
+      rooms.forEach(room => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${room.name}</td>
+          <td>${room.type}</td>
+          <td>${room.price}</td>
+          <td>${room.status}</td>
+          <td>
+            <button onclick="deleteRoom('${room._id}')">Sil</button>
+            <button onclick="editRoomPrompt('${room._id}', '${room.name}', '${room.type}', '${room.price}', '${room.status}')">Düzenle</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    document.getElementById('addRoomForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('roomName').value;
+      const type = document.getElementById('roomType').value;
+      const price = parseInt(document.getElementById('roomPrice').value);
+      const status = document.getElementById('roomStatus').value;
+
+      const res = await fetch('/admin/rooms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, type, price, status })
+      });
+
+      const data = await res.json();
+      alert(data.message);
+      e.target.reset();
+      fetchRooms();
+    });
+
+    async function deleteRoom(id) {
+      const confirmed = confirm("Bu odayı silmek istediğinizden emin misiniz?");
+      if (!confirmed) return;
+
+      const res = await fetch(`/admin/rooms/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      alert(data.message);
+      fetchRooms();
+    }
+
+    async function editRoomPrompt(id, name, type, price, status) {
+      const newName = prompt("Yeni Oda Adı:", name);
+      const newType = prompt("Yeni Tür (standart/deluxe/suit):", type);
+      const newPrice = prompt("Yeni Fiyat (₺):", price);
+      const newStatus = prompt("Yeni Durum (dolu/boş):", status);
+
+      const res = await fetch(`/admin/rooms/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: newName,
+          type: newType,
+          price: parseInt(newPrice),
+          status: newStatus
+        })
+      });
+
+      const data = await res.json();
+      alert(data.message);
+      fetchRooms();
+    }
+
+    function logout() {
+      fetch('/logout')
+        .then(() => {
+          window.location.href = '/index.html';
+        })
+        .catch(err => {
+          console.error("Çıkış yapılamadı:", err);
+          alert("Çıkış sırasında bir hata oluştu.");
+        });
+    }
+
+    fetchRooms();
+  </script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Kayıt Ol</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .form-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .form-container h2 {
+      margin-top: 40px;
+      color: #0077b6;
+    }
+    .form-container .link {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="form-container">
+    <h2>Kayıt Ol</h2>
+
+    <form id="registerForm">
+      <input type="text" id="username" name="username" placeholder="Kullanıcı Adı" required />
+      <input type="email" id="email" name="email" placeholder="E-posta" required />
+      <input type="password" id="password" name="password" placeholder="Şifre" required />
+      <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Şifreyi Onayla" required />
+      <button type="submit">Kayıt Ol</button>
+    </form>
+
+    <div class="link">
+      <p>Zaten hesabınız var mı? <a href="login.html">Giriş Yap</a></p>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('registerForm');
+
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const username = document.getElementById('username').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      const regex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]).{8,}$/;
+      if (!regex.test(password)) {
+        alert('Şifre en az 8 karakter uzunluğunda olmalı ve en az bir harf, bir rakam ve bir özel karakter içermelidir.');
+        return;
+      }
+
+      if(password !== confirmPassword) {
+        alert('Şifreler uyuşmuyor!');
+        return;
+      }
+
+      try {
+        const response = await fetch('/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, email, password })
+        });
+
+        const data = await response.json();
+
+        if(response.ok) {
+          alert(data.message);
+          form.reset();
+          if(data.redirectUrl) {
+            window.location.href = data.redirectUrl;
+          }
+        } else {
+          alert(data.message);
+        }
+      } catch (error) {
+        alert('Sunucu hatası, lütfen tekrar deneyin.');
+      }
+    });
+  </script>
+
+</body>
+</html>
